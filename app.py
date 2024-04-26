@@ -6,13 +6,33 @@ import keyword
 import platform
 
 
+class upperMenu(ctk.CTkCanvas):
+    
+
+    def __init__(self, *args, **kwargs):
+        ctk.CTkCanvas.__init__(self, *args, **kwargs)
+        
+
+    def attach(self, text_widget):
+        self.textwidget = text_widget
+
+
+    def create_tab(self, name):
+        self.tab = tk.Menu()
+        
+
+
 class TextLineNumbers(ctk.CTkCanvas):
+    
+
     def __init__(self,*args,**kwargs):
         ctk.CTkCanvas.__init__(self,*args,**kwargs) #init using parent class initialisation
         self.textwidget = None
         self.fontSize = 12
         self.configFont()
         self.text_color = "black"
+
+
     def configFont(self): # dont know if needed tbh
         system = platform.system().lower()
         if system == "windows":
@@ -20,8 +40,10 @@ class TextLineNumbers(ctk.CTkCanvas):
         elif system == "linux":
             self.font = font.Font(family='monospace',size = self.fontSize)
 
+
     def attach(self, text_widget):
         self.textwidget = text_widget
+
 
     def redraw(self,*args):
         self.delete('all')
@@ -35,10 +57,12 @@ class TextLineNumbers(ctk.CTkCanvas):
             self.create_text(1,y,anchor="nw", font=self.font,text = linenum, fill = "#003200")
             i = self.textwidget.index("%s+1line" % i)
 
+
 class TextPad(tk.Text):
     
+
     def __init__(self, *args, **kwargs):
-        tk.Text.__init__(self, *args, **kwargs, bg="#331e36",fg='white',font=font.Font(family='monospace',size=14))
+        tk.Text.__init__(self, *args, **kwargs, bg="#331e36",fg='white',font=font.Font(family='monospace',size=14), padx=5)
         # !!!!
         self.tk.eval('''
             proc widget_proxy {widget widget_command args} {
@@ -70,7 +94,23 @@ class TextPad(tk.Text):
 
         self.fontSize = 20
 
+    
+    #TODO add functuanality
+    def highlight():
+    '''
+    highlight everything in line 
+    '''
+    
+    #TODO add everything
+    def highlightAll():
+    '''
+    for line in file: highlight
+    '''
+
+
 class App(ctk.CTkFrame):
+
+
     def __init__(self,master=None):
         super().__init__(master)# again init using parent method    
         self.pack(expand=True,fill=tk.BOTH)
@@ -78,16 +118,14 @@ class App(ctk.CTkFrame):
         self.style=ttk.Style()
         self.style.theme_use("clam")
 
+
     def initUI(self):
         frame1 = ctk.CTkFrame(self)
         frame1.pack(fill=ctk.BOTH,expand=True)
         
-        #texpad
-
+        #textpad 
         self.textpad = TextPad(frame1)
         self.textpad.pack(fill=tk.BOTH, expand=True)
-        
-
 
         #TextLineNumbers
         self.textline = TextLineNumbers(frame1, width=30)
@@ -96,8 +134,10 @@ class App(ctk.CTkFrame):
         self.textpad.bind("<<Change>>", self.on_change)
         self.textpad.bind("<Configure>", self.on_change)
         
+
     def on_change(self, event):
         self.textline.redraw()
+        
 
 
 
@@ -106,4 +146,4 @@ if __name__ == '__main__':
     app.master.title("temp")
     app.master.minsize(width = 800, height=600)
     app.mainloop()
-
+    
