@@ -1,6 +1,6 @@
 import tkinter as tk 
 import customtkinter as ctk 
-from tkinter import ttk
+from tkinter import ttk, filedialog
 from tkinter import font
 import keyword
 import platform
@@ -43,6 +43,23 @@ class RightPanel(ctk.CTkFrame):
         self.frame1 = ctk.CTkFrame(self)
         self.textPad = TextPad(self.frame1)
         self.textPad.pack(side=tk.RIGHT,expand=True,fill=tk.BOTH)
+
+    def saveFile(self):
+        file_path = filedialog.asksaveasfilename(filetypes=(('Текстовые документы (*.txt)', '*.txt'), ('Все файлы', '*.*')))
+
+        if file_path:
+            TextPad.delete('1.0', 'end')
+            TextPad.insert('1.0', open(file_path, encoding='utf-8').read())
+
+    def openFile(self):
+        file_path = filedialog.askopenfilename(title='Выбор файла',
+                                              filetypes=(
+                                              ('Текстовые документы (*.txt)', '*.txt'), ('Все файлы', '*.*')))
+        if file_path:
+            TextPad.delete('1.0', 'end')
+            TextPad.insert('1.0', open(file_path, encoding='utf-8').read())
+
+
 
         
     
