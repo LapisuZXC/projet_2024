@@ -24,25 +24,22 @@ class ToolTip(ctk.CTkCanvas):
 class LeftPanel(ctk.CTkFrame):
     def __init__(self, *args, **kwargs):
         ctk.CTkFrame.__init__(self, *args, **kwargs)
-
-
-   
-    #TODO make leftpanel itself
+    # TODO make leftpanel itself
 
 
 class RightPanel(ctk.CTkFrame):
-    #TODO save new open
+    # TODO save new open
 
-    def __init__(self, master=None):
+    def __init__(self, master=None, *args, **kwargs):
         super().__init__(master)
         self.master = master
-        self.pack()
-        self.initUI()
+        self.initUI(master, *args, **kwargs)
 
-    def initUI(self):
-        self.frame1 = ctk.CTkFrame(self)
-        self.textPad = TextPad(self.frame1)
+
+    def initUI(self, master, *args, **kwargs):
+        self.textPad = TextPad(master, *args, **kwargs)
         self.textPad.pack(side=tk.RIGHT,expand=True,fill=tk.BOTH)
+
 
     def saveFile(self):
         file_path = filedialog.asksaveasfilename(filetypes=(('Текстовые документы (*.txt)', '*.txt'), ('Все файлы', '*.*')))
@@ -59,10 +56,6 @@ class RightPanel(ctk.CTkFrame):
             TextPad.delete('1.0', 'end')
             TextPad.insert('1.0', open(file_path, encoding='utf-8').read())
 
-
-
-        
-    
 
 class TextLineNumbers(ctk.CTkCanvas):
     
@@ -140,8 +133,9 @@ class TextPad(tk.Text):
     #TODO add functuanality
     def highlight():
         pass
-    
-    #TODO ad    d everything
+
+
+    #TODO add everything
     def highlightAll():
         pass
 
@@ -161,17 +155,22 @@ class App(ctk.CTkFrame):
         frame1 = ctk.CTkFrame(self)
         frame1.pack(fill=ctk.BOTH,expand=True)
         
-        #textpad 
-        
-        self.textpad = TextPad(frame1,  bg="#331e36",fg='white',font=font.Font(family='monospace',size=14), padx=5)
-        
-        self.textpad.pack(fill=tk.BOTH, expand=True)
-        #TextLineNumbers
+        # textpad 
+        self.rightPanel = RightPanel(frame1,  bg="#331e36",fg='white',font=font.Font(family='monospace',size=14), padx=5)
+        self.rightPanel.textPad.pack(fill=tk.BOTH, expand=True)
         self.textline = TextLineNumbers(frame1, width=30)
-        self.textline.attach(self.textpad)
-        self.textline.pack(side='left', fill='y',before=self.textpad)
-        self.textpad.bind("<<Change>>", self.on_change)
-        self.textpad.bind("<Configure>", self.on_change)
+        self.textline.attach(self.rightPanel.textPad)
+        self.textline.pack(side='left', fill='y',before=self.rightPanel.textPad)
+        self.leftPanel = LeftPanel(frame1)
+        self.leftPanel.pack(side='left', fill='y',before=self.textline)
+
+        # TextLineNumbers
+        
+
+        self.rightPanel.textPad.bind("<<Change>>", self.on_change)
+        self.rightPanel.textPad.bind("<Configure>", self.on_change)
+    
+
     def on_change(self, event):
         self.textline.redraw()
         
