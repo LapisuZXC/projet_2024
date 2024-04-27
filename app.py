@@ -6,7 +6,7 @@ import keyword
 import platform
 
 
-class upperMenu(ctk.CTkCanvas):
+class ToolTip(ctk.CTkCanvas):
     
 
     def __init__(self, *args, **kwargs):
@@ -19,7 +19,18 @@ class upperMenu(ctk.CTkCanvas):
 
     def create_tab(self, name):
         self.tab = tk.Menu()
-        
+
+
+class LeftPanel(ctk.CTkFrame):
+    def __init__(self, *args, **kwargs):
+        ctk.CTkFrame.__init__(self, *args, **kwargs)
+
+   
+    #TODO make leftpanel itself
+
+
+class RightPanel(ctk.CTkFrame):
+    #TODO save new open
 
 
 class TextLineNumbers(ctk.CTkCanvas):
@@ -97,15 +108,11 @@ class TextPad(tk.Text):
     
     #TODO add functuanality
     def highlight():
-    '''
-    highlight everything in line 
-    '''
+        pass
     
     #TODO add everything
     def highlightAll():
-    '''
-    for line in file: highlight
-    '''
+        pass
 
 
 class App(ctk.CTkFrame):
@@ -133,8 +140,6 @@ class App(ctk.CTkFrame):
         self.textline.pack(side='left', fill='y',before=self.textpad)
         self.textpad.bind("<<Change>>", self.on_change)
         self.textpad.bind("<Configure>", self.on_change)
-        
-
     def on_change(self, event):
         self.textline.redraw()
         
