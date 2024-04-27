@@ -25,6 +25,7 @@ class LeftPanel(ctk.CTkFrame):
     def __init__(self, *args, **kwargs):
         ctk.CTkFrame.__init__(self, *args, **kwargs)
 
+
    
     #TODO make leftpanel itself
 
@@ -32,6 +33,19 @@ class LeftPanel(ctk.CTkFrame):
 class RightPanel(ctk.CTkFrame):
     #TODO save new open
 
+    def __init__(self, master=None):
+        super().__init__(master)
+        self.master = master
+        self.pack()
+        self.initUI()
+
+    def initUI(self):
+        self.frame1 = ctk.CTkFrame(self)
+        self.textPad = TextPad(self.frame1)
+        self.textPad.pack(side=tk.RIGHT,expand=True,fill=tk.BOTH)
+
+        
+    
 
 class TextLineNumbers(ctk.CTkCanvas):
     
@@ -73,7 +87,7 @@ class TextPad(tk.Text):
     
 
     def __init__(self, *args, **kwargs):
-        tk.Text.__init__(self, *args, **kwargs, bg="#331e36",fg='white',font=font.Font(family='monospace',size=14), padx=5)
+        tk.Text.__init__(self, *args, **kwargs)
         # !!!!
         self.tk.eval('''
             proc widget_proxy {widget widget_command args} {
@@ -86,7 +100,7 @@ class TextPad(tk.Text):
                     ([lrange $args 0 2] == {mark set insert}) || 
                     ([lrange $args 0 1] == {xview moveto}) ||
                     ([lrange $args 0 1] == {xview scroll}) ||
-                    ([lrange $args 0 1] == {yview moveto}) ||
+                        ([lrange $args 0 1] == {yview moveto}) ||
                     ([lrange $args 0 1] == {yview scroll})} {
 
                     event generate  $widget <<Change>> -when tail
@@ -110,7 +124,7 @@ class TextPad(tk.Text):
     def highlight():
         pass
     
-    #TODO add everything
+    #TODO ad    d everything
     def highlightAll():
         pass
 
@@ -131,9 +145,10 @@ class App(ctk.CTkFrame):
         frame1.pack(fill=ctk.BOTH,expand=True)
         
         #textpad 
-        self.textpad = TextPad(frame1)
+        
+        self.textpad = TextPad(frame1,  bg="#331e36",fg='white',font=font.Font(family='monospace',size=14), padx=5)
+        
         self.textpad.pack(fill=tk.BOTH, expand=True)
-
         #TextLineNumbers
         self.textline = TextLineNumbers(frame1, width=30)
         self.textline.attach(self.textpad)
