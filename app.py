@@ -6,12 +6,17 @@ import keyword
 import platform
 
 
-class ToolTip(ctk.CTkCanvas):
+class ToolTip(ctk.CTkFrame):
     
 
-    def __init__(self, *args, **kwargs):
-        ctk.CTkCanvas.__init__(self, *args, **kwargs)
+    def __init__(self,master=None,*args,**kwargs):
+        super().__init__(master)
+        self.initUI(master,*args,**kwargs)
         
+    
+    def initUI(self,master,*args,**kwargs):
+        self.frame=ctk.CTkFrame(master, height=25)
+        self.frame.pack(expand=False, fill=ctk.BOTH,anchor='n',side=tk.TOP)
 
     def attach(self, text_widget):
         self.textwidget = text_widget
@@ -35,11 +40,14 @@ class RightPanel(ctk.CTkFrame):
         self.master = master
         self.initUI(master, *args, **kwargs)
 
-
     def initUI(self, master, *args, **kwargs):
         self.textPad = TextPad(master, *args, **kwargs)
-        self.textPad.pack(side=tk.RIGHT,expand=True,fill=tk.BOTH)
-
+        self.textPad.pack(side=tk.BOTTOM,expand=True,fill=tk.BOTH)
+        self.tooltip = ToolTip(master,*args,**kwargs)
+        self.tooltip.attach(master)
+        self.tooltip.file = tk.Menu(self.tooltip)
+        self.tooltip.file.add_cascade(label="file",menu = self.tooltip.file)
+        self.tooltip.file.add_command(label="Opne File",command=self.openFile())
 
     def saveFile(self):
         file_path = filedialog.asksaveasfilename(filetypes=(('Текстовые документы (*.txt)', '*.txt'), ('Все файлы', '*.*')))
@@ -59,6 +67,7 @@ class RightPanel(ctk.CTkFrame):
 
 class TextLineNumbers(ctk.CTkCanvas):
     
+
 
     def __init__(self,*args,**kwargs):
         ctk.CTkCanvas.__init__(self,*args,**kwargs) #init using parent class initialisation
@@ -156,8 +165,7 @@ class App(ctk.CTkFrame):
         frame1.pack(fill=ctk.BOTH,expand=True)
         
         # textpad 
-        self.rightPanel = RightPanel(frame1,  bg="#331e36",fg='white',font=font.Font(family='monospace',size=14), padx=5)
-        self.rightPanel.textPad.pack(fill=tk.BOTH, expand=True)
+        self.rightPanel = RightPanel(frame1,  bg="#331e36",fg='white',font=font.Font(family='monospace',size=14), padx=5,pady=0)        
         self.textline = TextLineNumbers(frame1, width=30)
         self.textline.attach(self.rightPanel.textPad)
         self.textline.pack(side='left', fill='y',before=self.rightPanel.textPad)
