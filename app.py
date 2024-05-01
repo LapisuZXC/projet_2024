@@ -43,11 +43,13 @@ class RightPanel(ctk.CTkFrame):
     def initUI(self, master, *args, **kwargs):
         self.textPad = TextPad(master, *args, **kwargs)
         self.textPad.pack(side=tk.BOTTOM,expand=True,fill=tk.BOTH)
-        self.tooltip = ToolTip(master,*args,**kwargs)
-        self.tooltip.attach(master)
-        self.tooltip.file = tk.Menu(self.tooltip)
-        self.tooltip.file.add_cascade(label="file",menu = self.tooltip.file)
-        self.tooltip.file.add_command(label="Opne File",command=self.openFile())
+        self.tools = ToolTip(master,*args,**kwargs)
+        self.tools.attach(master)
+        self.file = tk.Menu(master=self.tools)
+        self.file.add_command(label="Open File",command=lambda x:self.openFile())
+        self.file.pack(side=tk.LEFT)
+
+
 
     def saveFile(self):
         file_path = filedialog.asksaveasfilename(filetypes=(('Текстовые документы (*.txt)', '*.txt'), ('Все файлы', '*.*')))
