@@ -1,9 +1,14 @@
-import tkinter as tk 
-import customtkinter as ctk 
+import tkinter as tk
 from tkinter import ttk, filedialog
+import customtkinter as ctk
 from tkinter import font
 import keyword
 import platform
+from pygments.token import Keyword, Name, Comment, String, Error, \
+     Number, Operator, Generic, Whitespace, Punctuation, Other, Literal, Text
+from pygments.formatter import Formatter
+from pygments import highlight
+from pygments.lexers import PythonLexer
 
 
 class ToolTip(ctk.CTkFrame):
@@ -140,15 +145,36 @@ class TextPad(tk.Text):
 
         self.fontSize = 20
 
-    
-    #TODO add functuanality
-    def highlight():
-        pass
+
+# TODO associate a function with text directly from the application
+class CustomFormatter(Formatter):
+    def __init__(self, **options):
+        super(CustomFormatter, self).__init__(**options)
+        self.styles = {
+            Keyword: '\033[94m',  # Blue
+            Operator: '\033[91m',  # Red
+            Operator.Word: '\033[93m',  # Yellow
+            Number.Integer: '\033[91m',  # Red
+            Number.Float: '\033[91m',  # Red
+            String.Doc: '\033[92m',  # Green
+            String.Double: '\033[92m',  # Green (multiline comments)
+            Name: '\033[93m',  # Yellow
+            Name.Builtin: '\033[95m',  # Purple
+            Name.Function.Magic: '\033[95m',  # Purple ex. __init__
+            Comment.Single: '\033[92m',  # Green
+            Punctuation: '\033[93m',  # Yellow
+        }
+
+    def format(self, tokensource, outfile):
+        for ttype, value in tokensource:
+            color = self.styles.get(ttype, '\033[0m')  # Default text without color
+            outfile.write(f"{color}{value}\033[0m")  # Reset to default after each token
 
 
-    #TODO add everything
-    def highlightAll():
-        pass
+''' format function test 
+code = 'for u in range(10): print("Hello world!") \n#text \nprint(20.2) \nx=5 \n\'\'\'I love \ncoding\'\'\''
+formatted_code = highlight(code, PythonLexer(), CustomFormatter())
+print(formatted_code)'''
 
 
 class App(ctk.CTkFrame):
