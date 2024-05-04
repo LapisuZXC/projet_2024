@@ -77,7 +77,7 @@ class TextLineNumbers(ctk.CTkCanvas):
 
 
     def __init__(self,*args,**kwargs):
-        ctk.CTkCanvas.__init__(self,*args,**kwargs) #init using parent class initialisation
+        ctk.CTkCanvas.__init__(self,*args,**kwargs)  # init using parent class initialisation
         self.textwidget = None
         self.fontSize = 12
         self.configFont()
@@ -141,7 +141,7 @@ class TextPad(tk.Text):
             interp alias {{}} ::{widget} {{}} widget_proxy {widget} _{widget}
         '''.format(widget=str(self)))
         # all of that for real time update of TextLineNumbers
-        #basically there is custom tkinted event <<Change>> created 
+        # basically there is custom tkinted event <<Change>> created
 
         self.fontSize = 20
 
@@ -179,14 +179,12 @@ print(formatted_code)'''
 
 class App(ctk.CTkFrame):
 
-
     def __init__(self,master=None):
-        super().__init__(master)# again init using parent method    
+        super().__init__(master)  # again init using parent method
         self.pack(expand=True,fill=tk.BOTH)
         self.initUI()
         self.style=ttk.Style()
         self.style.theme_use("clam")
-
 
     def initUI(self):
         frame1 = ctk.CTkFrame(self)
@@ -205,13 +203,10 @@ class App(ctk.CTkFrame):
 
         self.rightPanel.textPad.bind("<<Change>>", self.on_change)
         self.rightPanel.textPad.bind("<Configure>", self.on_change)
-    
 
     def on_change(self, event):
         self.textline.redraw()
         
-
-
 
 if __name__ == '__main__':
     app = App()
