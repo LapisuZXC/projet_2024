@@ -11,7 +11,7 @@ from pygments import highlight
 from pygments.lexers import PythonLexer
 
 
-class ToolTip(ctk.CTkFrame):
+class UpperPanel(ctk.CTkFrame):
     
 
     def __init__(self,master=None,*args,**kwargs):
@@ -48,11 +48,11 @@ class RightPanel(ctk.CTkFrame):
     def initUI(self, master, *args, **kwargs):
         self.textPad = TextPad(master, *args, **kwargs)
         self.textPad.pack(side=tk.BOTTOM,expand=True,fill=tk.BOTH)
-        self.tools = ToolTip(master,*args,**kwargs)
+        self.tools = UpperPanel(master,*args,**kwargs)
         self.tools.attach(master)
         self.file = tk.Menu(master=self.tools)
         self.file.add_command(label="Open File",command=lambda x:self.openFile())
-        self.file.pack(side=tk.LEFT)
+    
 
 
 
