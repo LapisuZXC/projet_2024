@@ -11,7 +11,7 @@ from pygments import highlight
 from pygments.lexers import PythonLexer
 
 
-class UpperPanel(ctk.CTkFrame):
+class UpperPanel(tk.Frame):
     
 
     def __init__(self,master=None,*args,**kwargs):
@@ -19,9 +19,22 @@ class UpperPanel(ctk.CTkFrame):
         self.initUI(master,*args,**kwargs)
         
     
-    def initUI(self,master,*args,**kwargs):
-        self.frame=ctk.CTkFrame(master, height=25)
-        self.frame.pack(expand=False, fill=ctk.BOTH,anchor='n',side=tk.TOP)
+    def initUI(self, master, *args, **kwargs):
+        self.frame = tk.Frame(master, height=25)
+        self.menu_bar = tk.Menu(master)
+        # Create a CTkMenuBar widget
+        self.file_bar = tk.Menu(self.frame,name="file")
+
+        self.file_bar.add_command(label="New", underline=0,command=lambda x:self.new_file())
+        self.file_bar.add_command(label="Open", underline=0,command=lambda x:self.open_file())
+        self.file_bar.add_command(label="Save", underline=0,command=lambda x:self.save_file())
+        self.menu_bar.add_cascade(label="File", underline=0, menu=self.file_bar)
+        self.menu_bar.configure(menu=self.menu_bar)
+        
+
+        
+        
+        self.frame.pack(expand=False, fill=ctk.BOTH, anchor='n', side=tk.TOP)
 
     def attach(self, text_widget):
         self.textwidget = text_widget
@@ -31,15 +44,14 @@ class UpperPanel(ctk.CTkFrame):
         self.tab = tk.Menu()
 
 
+
 class LeftPanel(ctk.CTkFrame):
     def __init__(self, *args, **kwargs):
         ctk.CTkFrame.__init__(self, *args, **kwargs)
     # TODO make leftpanel itself
 
 
-class RightPanel(ctk.CTkFrame):
-    # TODO save new open
-
+class RightPanel(tk.Frame):
     def __init__(self, master=None, *args, **kwargs):
         super().__init__(master)
         self.master = master
@@ -50,9 +62,8 @@ class RightPanel(ctk.CTkFrame):
         self.textPad.pack(side=tk.BOTTOM,expand=True,fill=tk.BOTH)
         self.tools = UpperPanel(master,*args,**kwargs)
         self.tools.attach(master)
-        self.file = tk.Menu(master=self.tools)
-        self.file.add_command(label="Open File",command=lambda x:self.openFile())
-    
+        
+        
 
 
 
@@ -177,36 +188,36 @@ formatted_code = highlight(code, PythonLexer(), CustomFormatter())
 print(formatted_code)'''
 
 
-class App(ctk.CTkFrame):
+class App(tk.Tk):
 
     def __init__(self,master=None):
         super().__init__(master)  # again init using parent method
-        self.pack(expand=True,fill=tk.BOTH)
+        #self.pack(expand=True,fill=tk.BOTH)
         self.initUI()
         self.style=ttk.Style()
         self.style.theme_use("clam")
+        
 
     def initUI(self):
-        frame1 = ctk.CTkFrame(self)
-        frame1.pack(fill=ctk.BOTH,expand=True)
+        frame1 = tk.Frame(self)
+        frame1.pack(fill=ctk.BOTH, expand=True)
         
         # textpad 
-        self.rightPanel = RightPanel(frame1,  bg="#331e36",fg='white',font=font.Font(family='monospace',size=14), padx=5,pady=0)        
+        self.rightPanel = RightPanel(frame1, bg="#331e36", fg='white', font=font.Font(family='monospace', size=14), padx=5, pady=0)
         self.textline = TextLineNumbers(frame1, width=30)
         self.textline.attach(self.rightPanel.textPad)
-        self.textline.pack(side='left', fill='y',before=self.rightPanel.textPad)
+        self.textline.pack(side='left', fill='y', before=self.rightPanel.textPad)
         self.leftPanel = LeftPanel(frame1)
-        self.leftPanel.pack(side='left', fill='y',before=self.textline)
+        self.leftPanel.pack(side='left', fill='y', before=self.textline)
 
         # TextLineNumbers
-        
 
         self.rightPanel.textPad.bind("<<Change>>", self.on_change)
         self.rightPanel.textPad.bind("<Configure>", self.on_change)
 
     def on_change(self, event):
         self.textline.redraw()
-        
+
 
 if __name__ == '__main__':
     app = App()
