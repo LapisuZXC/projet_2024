@@ -1,6 +1,6 @@
 from tkinter import *
 from tkinter import messagebox, filedialog
-
+from customtkinter import *
 
 # Фнукция для изменения темы
 def change_theme(theme):
