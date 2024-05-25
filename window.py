@@ -1,6 +1,17 @@
 from tkinter import *
 from tkinter import messagebox, filedialog
-from customtkinter import *
+import customtkinter as ctk
+
+
+
+class App(Frame):
+    def __init__(self,master=None):
+        super().__init__(master)        
+        self.pack(expand=True,fill=BOTH)
+        self.initUI()
+    def initUI(self):
+        frame1 = ctk.CTkFrame(self)
+        frame1.pack(fill=BOTH,expand=True)
 
 # Фнукция для изменения темы
 def change_theme(theme):
@@ -40,11 +51,19 @@ def save_file():
     f.close()
 
 
-root = Tk() # создание окна
+root = ctk.CTk() # создание окна
 root.title('IDE')
 root.geometry('600x700')
+root.minsize(width=600,height=700)
 
-f_text = Frame(root) # создание области для записи текста
+
+
+
+tab_flag = False
+
+if tab_flag:
+    tab_handler.add("tab1")
+f_text = ctk.CTkFrame(root,border_width=2,border_color="white")# создание области для записи текста
 f_text.pack(fill=BOTH, expand=1)
 
 main_menu = Menu(root)
@@ -125,5 +144,7 @@ scroll = Scrollbar(f_text, command=text_fild.yview)
 scroll.pack(side=LEFT, fill=Y)
 text_fild.config(yscrollcommand=scroll.set)
 
-
+app = App()
+app.master.title("Temp title")
+app.master.minsize(width=800, height=600)
 root.mainloop()
