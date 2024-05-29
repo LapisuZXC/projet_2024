@@ -11,17 +11,7 @@ from pygments.formatter import Formatter
 from pygments import highlight
 from pygments.lexers import PythonLexer
 
-
-
-
-class MyMenu(tk.Menu):
-    def __init__(self,master=None,*args,**kwargs):
-        super().__init__(master)
-        self.initUI(master,*args,**kwargs)
-
-    def initUI(self, master, *args, **kwargs):
-        self.menu = tk.Menu(master=master, tearoff=0,**kwargs)
-        
+  
 
 class UpperPanel(tk.Frame):
     
@@ -41,21 +31,11 @@ class UpperPanel(tk.Frame):
         self.new_b.pack(side=tk.LEFT,expand=False, fill=tk.BOTH)
         self.open_b.pack(side=tk.LEFT,expand=False, fill=tk.BOTH)
         self.save_b.pack(side=tk.LEFT,expand=False, fill=tk.BOTH)
-
-        
-        
-
-        
-        
         self.frame.pack(expand=False, fill=ctk.BOTH, anchor='n', side=tk.TOP)
+        
 
     def attach(self, text_widget):
         self.textwidget = text_widget
-
-
-    def create_tab(self, name):
-        self.tab = tk.Menu()
-
 
 
 class LeftPanel(ctk.CTkFrame):
@@ -65,16 +45,18 @@ class LeftPanel(ctk.CTkFrame):
 
 
 class RightPanel(tk.Frame):
+    
     def __init__(self, master=None, *args, **kwargs):
         super().__init__(master)
         self.master = master
         self.initUI(master, *args, **kwargs)
 
     def initUI(self, master, *args, **kwargs):
-        self.textPad = TextPad(master, *args, **kwargs)
-        self.textPad.pack(side=tk.BOTTOM,expand=True,fill=tk.BOTH)
-        self.tools = UpperPanel(master,self,*args,**kwargs)
-        self.tools.attach(master)
+        self.textPad = TextPad(master, *args, **kwargs)                 # Само поле где пишется текст
+        self.textPad.pack(side=tk.BOTTOM,expand=True,fill=tk.BOTH)    
+        self.tools = UpperPanel(master,self,*args,**kwargs)             # Тут кнопочки всякие
+        self.tools.attach(master)#?
+        
         
         
     def newFile(self):
@@ -170,6 +152,7 @@ class TextPad(tk.Text):
 
         self.fontSize = 20
 
+        
 
 # TODO associate a function with text directly from the application
 class CustomFormatter(Formatter):
@@ -223,6 +206,11 @@ class App(tk.Tk):
         self.textline.pack(side='left', fill='y', before=self.rightPanel.textPad)
         self.leftPanel = LeftPanel(frame1)
         self.leftPanel.pack(side='left', fill='y', before=self.textline)
+        self.terminal = Terminal(frame1,height=10,background='black',foreground='white',font=font.Font(family='monospace', size=14),padx=5,
+                                  pady=0,insertbackground='white',selectbackground='white',highlightthickness=0)
+        self.terminal.shell = True
+        self.terminal.pack(side=tk.BOTTOM, expand=True,fill=tk.BOTH,before=self.rightPanel.textPad)
+        
 
         # TextLineNumbers
 
@@ -235,7 +223,7 @@ class App(tk.Tk):
 
 if __name__ == '__main__':
     app = App()
-    #app.master.title("temp")
-    #app.master.minsize(width = 800, height=600)
+    
+    
     app.mainloop()
     
