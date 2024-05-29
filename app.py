@@ -2,6 +2,7 @@ import tkinter as tk
 from tkinter import ttk, filedialog
 import customtkinter as ctk
 from tkinter import font
+from tkterminal import Terminal
 import keyword
 import platform
 from pygments.token import Keyword, Name, Comment, String, Error, \
@@ -11,25 +12,37 @@ from pygments import highlight
 from pygments.lexers import PythonLexer
 
 
+
+
+class MyMenu(tk.Menu):
+    def __init__(self,master=None,*args,**kwargs):
+        super().__init__(master)
+        self.initUI(master,*args,**kwargs)
+
+    def initUI(self, master, *args, **kwargs):
+        self.menu = tk.Menu(master=master, tearoff=0,**kwargs)
+        
+
 class UpperPanel(tk.Frame):
     
 
-    def __init__(self,master=None,*args,**kwargs):
+    def __init__(self,master=None,right_panel=None,*args,**kwargs):
         super().__init__(master)
+        self.right_panel = right_panel
         self.initUI(master,*args,**kwargs)
         
     
     def initUI(self, master, *args, **kwargs):
         self.frame = tk.Frame(master, height=25)
-        self.menu_bar = tk.Menu(master)
+        self.save_b = ctk.CTkButton(self.frame,fg_color="gray",corner_radius=0,width=55,text="save",command=lambda : self.right_panel.saveFile())
+        self.open_b = ctk.CTkButton(self.frame,fg_color="gray",corner_radius=0,width=55,text="open",command=lambda : self.right_panel.openFile())
+        self.new_b = ctk.CTkButton(self.frame,fg_color="gray",corner_radius=0,width=55,text="new",command=lambda : self.right_panel.newFile())
         # Create a CTkMenuBar widget
-        self.file_bar = tk.Menu(self.frame,name="file")
+        self.new_b.pack(side=tk.LEFT,expand=False, fill=tk.BOTH)
+        self.open_b.pack(side=tk.LEFT,expand=False, fill=tk.BOTH)
+        self.save_b.pack(side=tk.LEFT,expand=False, fill=tk.BOTH)
 
-        self.file_bar.add_command(label="New", underline=0,command=lambda x:self.new_file())
-        self.file_bar.add_command(label="Open", underline=0,command=lambda x:self.open_file())
-        self.file_bar.add_command(label="Save", underline=0,command=lambda x:self.save_file())
-        self.menu_bar.add_cascade(label="File", underline=0, menu=self.file_bar)
-        self.menu_bar.configure(menu=self.menu_bar)
+        
         
 
         
@@ -60,28 +73,29 @@ class RightPanel(tk.Frame):
     def initUI(self, master, *args, **kwargs):
         self.textPad = TextPad(master, *args, **kwargs)
         self.textPad.pack(side=tk.BOTTOM,expand=True,fill=tk.BOTH)
-        self.tools = UpperPanel(master,*args,**kwargs)
+        self.tools = UpperPanel(master,self,*args,**kwargs)
         self.tools.attach(master)
         
         
-
+    def newFile(self):
+        self.textPad.delete('1.0', 'end')
 
 
     def saveFile(self):
         file_path = filedialog.asksaveasfilename(filetypes=(('Текстовые документы (*.txt)', '*.txt'), ('Все файлы', '*.*')))
 
         if file_path:
-            TextPad.delete('1.0', 'end')
-            TextPad.insert('1.0', open(file_path, encoding='utf-8').read())
+            self.textPad.delete('1.0', 'end')
+            self.textPad.insert('1.0', open(file_path, encoding='utf-8').read())
 
     def openFile(self):
         file_path = filedialog.askopenfilename(title='Выбор файла',
                                               filetypes=(
                                               ('Текстовые документы (*.txt)', '*.txt'), ('Все файлы', '*.*')))
         if file_path:
-            TextPad.delete('1.0', 'end')
-            TextPad.insert('1.0', open(file_path, encoding='utf-8').read())
-
+            self.textPad.delete('1.0', 'end')
+            self.textPad.insert('1.0', open(file_path, encoding='utf-8').read())
+            
 
 class TextLineNumbers(ctk.CTkCanvas):
     
@@ -221,7 +235,7 @@ class App(tk.Tk):
 
 if __name__ == '__main__':
     app = App()
-    app.master.title("temp")
-    app.master.minsize(width = 800, height=600)
+    #app.master.title("temp")
+    #app.master.minsize(width = 800, height=600)
     app.mainloop()
     
