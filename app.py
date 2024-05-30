@@ -10,6 +10,7 @@ from pygments.token import Keyword, Name, Comment, String, Error, \
 from pygments.formatter import Formatter
 from pygments import highlight
 from pygments.lexers import PythonLexer
+import os
 
   
 
@@ -38,17 +39,58 @@ class UpperPanel(tk.Frame):
         self.textwidget = text_widget
 
 
-class LeftPanel(ctk.CTkFrame):
-    def __init__(self, *args, **kwargs):
-        ctk.CTkFrame.__init__(self, *args, **kwargs)
-    # TODO make leftpanel itself
+class LeftPanel(tk.Frame): 
+    def __init__(self, master=None,right_panel=None): 
+        super().__init__(master) 
+        self.right_panel = right_panel
+        self.selected_dir = None
+        self.initUI(master) 
+ 
+    def initUI(self, master):
+        self.selected_file = tk.StringVar()
+        self.selected_file.trace_add("write", self.on_selected_file_change)
+        if self.right_panel.selected_file:
+            self.selected_dir = os.path.dirname(self.right_panel.selected_file)
 
+        self.breadcrumb = tk.StringVar(value="File")  # Initialize Breadcrumb 
+        self.breadcrumb_label = ctk.CTkLabel( 
+            self, textvariable=self.breadcrumb, text_color="white" 
+        ) 
+        self.breadcrumb_label.pack(pady=5) 
+        
+        self.file_list = tk.Listbox( 
+            self, 
+            selectmode=tk.SINGLE, 
+            width=20, 
+            height=10, 
+            highlightthickness=0, 
+            activestyle="none", 
+            background="#331e36", 
+            foreground="white", 
+            font=font.Font(family='monospace', size=12), 
+        )
+        for i in os.listdir(self.selected_dir):
+            self.file_list.insert(tk.END, i)
+        self.file_list.pack(expand=True, fill=tk.BOTH) 
+
+        self.file_list.bind("<<ListboxSelect>>", self.on_file_select) 
+        
+ 
+    def on_file_select(self, event): 
+        selection = self.file_list.curselection() 
+        if selection: 
+            selected_index = selection[0] 
+            selected_item = self.file_list.get(selected_index) 
+            self.breadcrumb.set(f"File / {selected_item}")
+    def on_selected_file_change(self, event):
+        self.selected_dir = os.path.dirname(self.right_panel.selected_dir)
 
 class RightPanel(tk.Frame):
     
     def __init__(self, master=None, *args, **kwargs):
         super().__init__(master)
         self.master = master
+        self.selected_file = ""
         self.initUI(master, *args, **kwargs)
 
     def initUI(self, master, *args, **kwargs):
@@ -65,7 +107,7 @@ class RightPanel(tk.Frame):
 
     def saveFile(self):
         file_path = filedialog.asksaveasfilename(filetypes=(('Текстовые документы (*.txt)', '*.txt'), ('Все файлы', '*.*')))
-
+        self.selected_file = file_path
         if file_path:
             self.textPad.delete('1.0', 'end')
             self.textPad.insert('1.0', open(file_path, encoding='utf-8').read())
@@ -149,9 +191,9 @@ class TextPad(tk.Text):
         '''.format(widget=str(self)))
         # all of that for real time update of TextLineNumbers
         # basically there is custom tkinted event <<Change>> created
-
+        
         self.fontSize = 20
-
+        
         
 
 # TODO associate a function with text directly from the application
@@ -204,7 +246,7 @@ class App(tk.Tk):
         self.textline = TextLineNumbers(frame1, width=30)
         self.textline.attach(self.rightPanel.textPad)
         self.textline.pack(side='left', fill='y', before=self.rightPanel.textPad)
-        self.leftPanel = LeftPanel(frame1)
+        self.leftPanel = LeftPanel(master=frame1,right_panel=self.rightPanel)
         self.leftPanel.pack(side='left', fill='y', before=self.textline)
         self.terminal = Terminal(frame1,height=10,background='black',foreground='white',font=font.Font(family='monospace', size=14),padx=5,
                                   pady=0,insertbackground='white',selectbackground='white',highlightthickness=0)
