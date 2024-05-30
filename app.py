@@ -19,9 +19,10 @@ class UpperPanel(tk.Frame):
         super().__init__(master)
         self.right_panel = right_panel
         self.initUI(master, *args, **kwargs)
+        
 
     def initUI(self, master, *args, **kwargs):
-        self.frame = tk.Frame(master, height=25)
+        self.frame = tk.Frame(master, height=25, bg="#0e171a")
         self.save_b = ctk.CTkButton(self.frame, fg_color="gray", corner_radius=0, width=55, text="save",
                                     command=lambda: self.right_panel.saveFile())
         self.open_b = ctk.CTkButton(self.frame, fg_color="gray", corner_radius=0, width=55, text="open",
@@ -34,6 +35,7 @@ class UpperPanel(tk.Frame):
         self.save_b.pack(side=tk.LEFT, expand=False, fill=tk.BOTH)
         self.frame.pack(expand=False, fill=ctk.BOTH, anchor='n', side=tk.TOP, before=self.right_panel.textPad)
 
+
     def attach(self, text_widget):
         self.textwidget = text_widget
 
@@ -42,7 +44,7 @@ class LeftPanel(tk.Frame):
     def __init__(self, master=None, right_panel=None):
         super().__init__(master)
         self.right_panel = right_panel
-        
+        self.configure(bg="#0E171A")
         self.initUI(master)
 
     def initUI(self, master):
@@ -50,7 +52,7 @@ class LeftPanel(tk.Frame):
         
         self.breadcrumb = tk.StringVar(value="File")  # Initialize Breadcrumb
         self.breadcrumb_label = ctk.CTkLabel(
-            self, textvariable=self.breadcrumb, text_color="white"
+            self, textvariable=self.breadcrumb, text_color="white", bg_color="#0E171A",
         )
         self.breadcrumb_label.pack(pady=5)
 
@@ -61,8 +63,8 @@ class LeftPanel(tk.Frame):
             height=10,
             highlightthickness=0,
             activestyle="none",
-            background="#331e36",
-            foreground="white",
+            background="#0E171A",
+            foreground="#DFEAEE",
             font=font.Font(family='monospace', size=12),
         )
 
@@ -145,10 +147,10 @@ class TextLineNumbers(ctk.CTkCanvas):
     def __init__(self, *args, **kwargs):
         ctk.CTkCanvas.__init__(self, *args, **kwargs)  # init using parent class initialisation
         self.textwidget = None
-        self.configure(bg="#0e003f")
+        self.configure(bg="#A3C5CE")
         self.fontSize = 12
         self.configFont()
-        self.text_color = "black"
+        self.text_color = "#DFEAEE"
 
     def configFont(self):  # dont know if needed tbh
         system = platform.system().lower()
@@ -224,26 +226,26 @@ class TextPad(tk.Text):
             self.tag_configure("Token.Name", foreground="#FFFFFF")
             self.tag_configure("Token.Text", foreground="#FFFFFF")
 
-            self.tag_configure("Token.Keyword", foreground="#CC7A00")
-            self.tag_configure("Token.Keyword.Constant", foreground="#CC7A00")
-            self.tag_configure("Token.Keyword.Declaration", foreground="#CC7A00")
-            self.tag_configure("Token.Keyword.Namespace", foreground="#CC7A00")
-            self.tag_configure("Token.Keyword.Pseudo", foreground="#CC7A00")
-            self.tag_configure("Token.Keyword.Reserved", foreground="#CC7A00")
-            self.tag_configure("Token.Keyword.Type", foreground="#CC7A00")
+            self.tag_configure("Token.Keyword", foreground="#8e6fb2")
+            self.tag_configure("Token.Keyword.Constant", foreground="#8e6fb2")
+            self.tag_configure("Token.Keyword.Declaration", foreground="#8e6fb2")
+            self.tag_configure("Token.Keyword.Namespace", foreground="#8e6fb2")
+            self.tag_configure("Token.Keyword.Pseudo", foreground="#8e6fb2")
+            self.tag_configure("Token.Keyword.Reserved", foreground="#8e6fb2")
+            self.tag_configure("Token.Keyword.Type", foreground="#8e6fb2")
 
-            self.tag_configure("Token.Punctuation", foreground="#2d991d")
+            self.tag_configure("Token.Punctuation", foreground="#B96B85")
 
-            self.tag_configure("Token.Name.Class", foreground="#ddd313")
-            self.tag_configure("Token.Name.Exception", foreground="#ddd313")
+            self.tag_configure("Token.Name.Class", foreground="#FEB9C6")
+            self.tag_configure("Token.Name.Exception", foreground="#FEB9C6")
             self.tag_configure("Token.Name.Function", foreground="#298fb5")
             self.tag_configure("Token.Name.Function.Magic", foreground="#298fb5")
             self.tag_configure("Token.Name.Decorator", foreground="#298fb5")
 
-            self.tag_configure("Token.Name.Builtin", foreground="#CC7A00")
-            self.tag_configure("Token.Name.Builtin.Pseudo", foreground="#CC7A00")
+            self.tag_configure("Token.Name.Builtin", foreground="#8e6fb2")
+            self.tag_configure("Token.Name.Builtin.Pseudo", foreground="#8e6fb2")
 
-            self.tag_configure("Token.Operator.Word", foreground="#CC7A00")
+            self.tag_configure("Token.Operator.Word", foreground="#8e6fb2")
             self.tag_configure("Token.Operator", foreground="#FF0000")
 
             self.tag_configure("Token.Comment", foreground="#767d87")
@@ -253,8 +255,8 @@ class TextPad(tk.Text):
             self.tag_configure("Token.Literal.Number.Integer", foreground="#88daea")
             self.tag_configure("Token.Literal.Number.Float", foreground="#88daea")
             #
-            self.tag_configure("Token.Literal.String.Single", foreground="#35c666")
-            self.tag_configure("Token.Literal.String.Double", foreground="#35c666")
+            self.tag_configure("Token.Literal.String.Single", foreground="#B96B85")
+            self.tag_configure("Token.Literal.String.Double", foreground="#B96B85")
 
             self.mark_set("range_end", "range_start + %dc" % len(content))
             self.tag_add(str(token), "range_start", "range_end")
@@ -280,14 +282,15 @@ class App(tk.Tk):
         # self.pack(expand=True,fill=tk.BOTH)
         self.initUI()
         self.style = ttk.Style()
-        self.style.theme_use("clam")
+        self.configure(bg="#3F3A6D")
 
     def initUI(self):
-        frame1 = tk.Frame(self, bg="#000000")
+        frame1 = tk.Frame(self)
+        
         frame1.pack(fill=ctk.BOTH, expand=True)
 
         # textpad
-        self.rightPanel = RightPanel(frame1, bg="#331e36", fg='white', font=font.Font(family='monospace', size=14),
+        self.rightPanel = RightPanel(frame1, bg="#0E171A", fg='#DFEAEE', font=font.Font(family='monospace', size=14),
                                      padx=5, pady=0)
         self.textline = TextLineNumbers(frame1, width=30)
         self.textline.attach(self.rightPanel.textPad)
@@ -311,5 +314,5 @@ class App(tk.Tk):
 
 if __name__ == '__main__':
     app = App()
-
+    app.configure(bg="#3F3A6D")
     app.mainloop()
