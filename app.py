@@ -46,8 +46,8 @@ class LeftPanel(tk.Frame):
         self.initUI(master)
 
     def initUI(self, master):
-        self.file_path = tk.StringVar(master, self.right_panel.selected_dir.get())
-        self.selected_dir = os.path.dirname(self.file_path.get())
+        self.file_path = self.right_panel.selected_dir
+        
         self.breadcrumb = tk.StringVar(value="File")  # Initialize Breadcrumb
         self.breadcrumb_label = ctk.CTkLabel(
             self, textvariable=self.breadcrumb, text_color="white"
@@ -66,13 +66,13 @@ class LeftPanel(tk.Frame):
             font=font.Font(family='monospace', size=12),
         )
 
-        self.file_path.trace("w", self.update_file_list(self.file_path))
+        self.file_path.trace_add("write",lambda *args: self.update_file_list(self.file_path))
 
         self.file_list.pack(expand=True, fill=tk.BOTH)
 
         self.file_list.bind("<<ListboxSelect>>", self.on_file_select)
 
-    def update_file_list(self, file_path):
+    def update_file_list(self, file_path: tk.StringVar):
         bufer = file_path.get()
         print(bufer)
         if bufer != '':
@@ -132,6 +132,7 @@ class RightPanel(tk.Frame):
             self.textPad.delete('1.0', 'end')
             self.textPad.insert('1.0', open(file_path, encoding='utf-8').read())
             self.selected_dir.set(os.path.dirname(file_path))
+            print(self.selected_dir.get())
 
     def update_text_from_file(self):
         if self.selected_file:
