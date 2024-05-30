@@ -7,94 +7,111 @@ import keyword
 import platform
 import os
 from pygments.token import Keyword, Name, Comment, String, Error, \
-     Number, Operator, Generic, Whitespace, Punctuation, Other, Literal, Text
+    Number, Operator, Generic, Whitespace, Punctuation, Other, Literal, Text
 from pygments.formatter import Formatter
 from pygments import highlight, lex
 from pygments.lexers import PythonLexer
 
-  
 
 class UpperPanel(tk.Frame):
 
-    def __init__(self,master=None,right_panel=None,*args,**kwargs):
+    def __init__(self, master=None, right_panel=None, *args, **kwargs):
         super().__init__(master)
         self.right_panel = right_panel
-        self.initUI(master,*args,**kwargs)
+        self.initUI(master, *args, **kwargs)
 
     def initUI(self, master, *args, **kwargs):
         self.frame = tk.Frame(master, height=25)
-        self.save_b = ctk.CTkButton(self.frame,fg_color="gray",corner_radius=0,width=55,text="save",command=lambda : self.right_panel.saveFile())
-        self.open_b = ctk.CTkButton(self.frame,fg_color="gray",corner_radius=0,width=55,text="open",command=lambda : self.right_panel.openFile())
-        self.new_b = ctk.CTkButton(self.frame,fg_color="gray",corner_radius=0,width=55,text="new",command=lambda : self.right_panel.newFile())
+        self.save_b = ctk.CTkButton(self.frame, fg_color="gray", corner_radius=0, width=55, text="save",
+                                    command=lambda: self.right_panel.saveFile())
+        self.open_b = ctk.CTkButton(self.frame, fg_color="gray", corner_radius=0, width=55, text="open",
+                                    command=lambda: self.right_panel.openFile())
+        self.new_b = ctk.CTkButton(self.frame, fg_color="gray", corner_radius=0, width=55, text="new",
+                                   command=lambda: self.right_panel.newFile())
         # Create a CTkMenuBar widget
-        self.new_b.pack(side=tk.LEFT,expand=False, fill=tk.BOTH)
-        self.open_b.pack(side=tk.LEFT,expand=False, fill=tk.BOTH)
-        self.save_b.pack(side=tk.LEFT,expand=False, fill=tk.BOTH)
-        self.frame.pack(expand=False, fill=ctk.BOTH, anchor='n', side=tk.TOP,before=self.right_panel.textPad)
+        self.new_b.pack(side=tk.LEFT, expand=False, fill=tk.BOTH)
+        self.open_b.pack(side=tk.LEFT, expand=False, fill=tk.BOTH)
+        self.save_b.pack(side=tk.LEFT, expand=False, fill=tk.BOTH)
+        self.frame.pack(expand=False, fill=ctk.BOTH, anchor='n', side=tk.TOP, before=self.right_panel.textPad)
 
     def attach(self, text_widget):
         self.textwidget = text_widget
 
 
-class LeftPanel(tk.Frame): 
-    def __init__(self, master=None,right_panel=None): 
-        super().__init__(master) 
+class LeftPanel(tk.Frame):
+    def __init__(self, master=None, right_panel=None):
+        super().__init__(master)
         self.right_panel = right_panel
-        self.selected_dir = None
-        self.initUI(master) 
- 
+        self.selected_dir = self.right_panel.selected_dir
+        self.initUI(master)
+
     def initUI(self, master):
-        self.selected_file = tk.StringVar()
-        self.selected_file.trace_add("write", self.on_selected_file_change)
-        if self.right_panel.selected_file:
-            self.selected_dir = os.path.dirname(self.right_panel.selected_file)
-
-        self.breadcrumb = tk.StringVar(value="File")  # Initialize Breadcrumb 
-        self.breadcrumb_label = ctk.CTkLabel( 
-            self, textvariable=self.breadcrumb, text_color="white" 
-        ) 
-        self.breadcrumb_label.pack(pady=5) 
-        
-        self.file_list = tk.Listbox( 
-            self, 
-            selectmode=tk.SINGLE, 
-            width=20, 
-            height=10, 
-            highlightthickness=0, 
-            activestyle="none", 
-            background="#331e36", 
-            foreground="white", 
-            font=font.Font(family='monospace', size=12), 
+        self.file_path = tk.StringVar(master, self.right_panel.selected_dir)
+        self.selected_dir = os.path.dirname(self.file_path.get())
+        self.breadcrumb = tk.StringVar(value="File")  # Initialize Breadcrumb
+        self.breadcrumb_label = ctk.CTkLabel(
+            self, textvariable=self.breadcrumb, text_color="white"
         )
-        for i in os.listdir(self.selected_dir):
-            self.file_list.insert(tk.END, i)
-        self.file_list.pack(expand=True, fill=tk.BOTH) 
+        self.breadcrumb_label.pack(pady=5)
 
-        self.file_list.bind("<<ListboxSelect>>", self.on_file_select) 
-        
- 
-    def on_file_select(self, event): 
-        selection = self.file_list.curselection() 
-        if selection: 
-            selected_index = selection[0] 
-            selected_item = self.file_list.get(selected_index) 
+        self.file_list = tk.Listbox(
+            self,
+            selectmode=tk.SINGLE,
+            width=20,
+            height=10,
+            highlightthickness=0,
+            activestyle="none",
+            background="#331e36",
+            foreground="white",
+            font=font.Font(family='monospace', size=12),
+        )
+
+        self.file_path.trace("w", self.update_file_list(self.file_path))
+
+        self.file_list.pack(expand=True, fill=tk.BOTH)
+
+        self.file_list.bind("<<ListboxSelect>>", self.on_file_select)
+
+
+    def update_file_list(self, file_path):
+        bufer = file_path.get()
+        print(bufer)
+        if bufer != '':
+            self.file_list.delete(0, tk.END)
+            for i in os.listdir(bufer):
+                self.file_list.insert(tk.END, i)
+            print('zhopa')
+
+    def on_file_select(self, event):
+        selection = self.file_list.curselection()
+        if selection:
+            selected_index = selection[0]
+            selected_item = self.file_list.get(selected_index)
             self.breadcrumb.set(f"File / {selected_item}")
-    def on_selected_file_change(self, event):
-        self.selected_dir = os.path.dirname(self.right_panel.selected_dir)
+
+            # Устанавливаем выбранный файл в правой панели
+            self.right_panel.selected_file = os.path.join(self.selected_dir, selected_item)
+            self.right_panel.update_text_from_file()
+
 
 class RightPanel(tk.Frame):
-    
-    def __init__(self, master=None, *args, **kwargs):
+    def __init__(self, master=None, left_panel=None, *args, **kwargs):
         super().__init__(master)
         self.master = master
-        self.selected_file = "" # Initialize selected file
+        self.selected_file = ""  # Initialize selected file
+        self.selected_dir = tk.StringVar(self, "")  # Initialize selected directory
         self.initUI(master, *args, **kwargs)
+        self.file_list = []
 
     def initUI(self, master, *args, **kwargs):
-        self.textPad = TextPad(master, *args, **kwargs)                 # Само поле где пишется текст
-        self.textPad.pack(side=tk.BOTTOM,expand=True,fill=tk.BOTH)    
-        self.tools = UpperPanel(master,self,*args,**kwargs)             # Тут кнопочки всякие
-        self.tools.attach(master)#?
+        self.textPad = TextPad(master, *args, **kwargs)  # Само поле где пишется текст
+        self.textPad.pack(side=tk.BOTTOM, expand=True, fill=tk.BOTH)
+        self.tools = UpperPanel(master, self, *args, **kwargs)  # Тут кнопочки всякие
+        self.tools.attach(master)  # ?
+
+    def on_selected_file_change(self, *args):
+        if self.selected_file:
+            self.selected_dir = os.path.dirname(self.selected_file)
 
     def newFile(self):
         self.textPad.delete('1.0', 'end')
@@ -110,36 +127,46 @@ class RightPanel(tk.Frame):
 
     def openFile(self):
         file_path = filedialog.askopenfilename(title='Выбор файла',
-                                              filetypes=(
-                                              ('Текстовые документы (*.txt)', '*.txt'), ('Все файлы', '*.*')))
+                                               filetypes=(
+                                                   ('Текстовые документы (*.txt)', '*.txt'), ('Все файлы', '*.*')))
         if file_path:
+            self.selected_file = file_path
             self.textPad.delete('1.0', 'end')
             self.textPad.insert('1.0', open(file_path, encoding='utf-8').read())
-            
+            self.selected_dir = os.path.dirname(file_path)
+
+    def update_text_from_file(self):
+        if self.selected_file:
+            with open(self.selected_file, 'r', encoding='utf-8') as file:
+                self.textPad.delete('1.0', tk.END)  # Очищаем текстовое поле
+                self.textPad.insert(tk.END, file.read())
+
+
+
 
 class TextLineNumbers(ctk.CTkCanvas):
-    def __init__(self,*args,**kwargs):
-        ctk.CTkCanvas.__init__(self,*args,**kwargs)  # init using parent class initialisation
+    def __init__(self, *args, **kwargs):
+        ctk.CTkCanvas.__init__(self, *args, **kwargs)  # init using parent class initialisation
         self.textwidget = None
         self.configure(bg="#0e003f")
         self.fontSize = 12
         self.configFont()
         self.text_color = "black"
 
-    def configFont(self): # dont know if needed tbh
+    def configFont(self):  # dont know if needed tbh
         system = platform.system().lower()
         if system == "windows":
             self.font = font.Font(family='monospace', size=self.fontSize)
         elif system == "linux":
-            self.font = font.Font(family='monospace',size = self.fontSize)
+            self.font = font.Font(family='monospace', size=self.fontSize)
 
     def attach(self, text_widget):
         self.textwidget = text_widget
 
-    def redraw(self,*args):
+    def redraw(self, *args):
         self.delete('all')
         i = self.textwidget.index("@0,0")
-        while True :
+        while True:
             dline = self.textwidget.dlineinfo(i)
             if dline is None:
                 break
@@ -181,7 +208,7 @@ class TextPad(tk.Text):
         '''.format(widget=str(self)))
         # all of that for real time update of TextLineNumbers
         # basically there is custom tkinted event <<Change>> created
-        
+
         self.fontSize = 20
         self.bind('<KeyRelease>', self.highlight, add='+')
 
@@ -236,9 +263,7 @@ class TextPad(tk.Text):
             self.tag_add(str(token), "range_start", "range_end")
             self.mark_set("range_start", "range_end")
 
-
     def highlightall(self, linesInFile, overlord, event=None):
-        
 
         code = self.get("1.0", "end-1c")
         i = 1
@@ -250,32 +275,32 @@ class TextPad(tk.Text):
             overlord.title('Loading ... ' + str(percent) + ' %')
             i += 1
 
+
 class App(tk.Tk):
 
-    def __init__(self,master=None):
+    def __init__(self, master=None):
         super().__init__(master)  # again init using parent method
-        #self.pack(expand=True,fill=tk.BOTH)
+        # self.pack(expand=True,fill=tk.BOTH)
         self.initUI()
-        self.configure(bg = "#000000")
-        self.style=ttk.Style()
+        self.style = ttk.Style()
         self.style.theme_use("clam")
 
     def initUI(self):
         frame1 = tk.Frame(self, bg="#000000")
         frame1.pack(fill=ctk.BOTH, expand=True)
-        
-        # textpad 
-        self.rightPanel = RightPanel(frame1, bg="#0e003f", fg='#FFFFFF', font=font.Font(family='monospace', size=14), padx=5, pady=0)
+
+        # textpad
+        self.rightPanel = RightPanel(frame1, bg="#331e36", fg='white', font=font.Font(family='monospace', size=14),
+                                     padx=5, pady=0)
         self.textline = TextLineNumbers(frame1, width=30)
         self.textline.attach(self.rightPanel.textPad)
         self.textline.pack(side='left', fill='y', before=self.rightPanel.textPad)
-        self.leftPanel = LeftPanel(master=frame1,right_panel=self.rightPanel)
+        self.leftPanel = LeftPanel(master=frame1, right_panel=self.rightPanel)
         self.leftPanel.pack(side='left', fill='y', before=self.textline)
         self.terminal = Terminal(frame1,height=10,background='#000000',foreground='#00FF00',font=font.Font(family='monospace', size=14),padx=5,
                                   pady=0,insertbackground='#FFFFFF',selectbackground='#FFFFFF',highlightthickness=0)
         self.terminal.shell = True
-        self.terminal.pack(side=tk.BOTTOM, expand=True,fill=tk.BOTH,before=self.rightPanel.textPad)
-        
+        self.terminal.pack(side=tk.BOTTOM, expand=True, fill=tk.BOTH, before=self.rightPanel.textPad)
 
         # TextLineNumbers
 
@@ -286,9 +311,8 @@ class App(tk.Tk):
         self.textline.redraw()
         self.rightPanel.textPad.highlightall(len(self.rightPanel.textPad.get('1.0', 'end-1c').splitlines()), self)
 
+
 if __name__ == '__main__':
     app = App()
-    
-    
+
     app.mainloop()
-    
