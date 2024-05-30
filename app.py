@@ -100,11 +100,13 @@ class RightPanel(tk.Frame):
         self.textPad.delete('1.0', 'end')
 
     def saveFile(self):
-        file_path = filedialog.asksaveasfilename(filetypes=(('Текстовые документы (*.txt)', '*.txt'), ('Все файлы', '*.*')))
-        self.selected_file = file_path
+        file_path = filedialog.asksaveasfilename(
+            defaultextension=".txt",
+            filetypes=(('Текстовые документы (*.txt)', '*.txt'), ('Все файлы', '*.*')))
+
         if file_path:
-            self.textPad.delete('1.0', 'end')
-            self.textPad.insert('1.0', open(file_path, encoding='utf-8').read())
+            with open(file_path, 'w', encoding='utf-8') as file:
+                file.write(self.textPad.get('1.0', 'end'))
 
     def openFile(self):
         file_path = filedialog.askopenfilename(title='Выбор файла',
@@ -119,6 +121,7 @@ class TextLineNumbers(ctk.CTkCanvas):
     def __init__(self,*args,**kwargs):
         ctk.CTkCanvas.__init__(self,*args,**kwargs)  # init using parent class initialisation
         self.textwidget = None
+        self.configure(bg="#0e003f")
         self.fontSize = 12
         self.configFont()
         self.text_color = "black"
@@ -142,7 +145,7 @@ class TextLineNumbers(ctk.CTkCanvas):
                 break
             y = dline[1]
             linenum = str(i).split(".")[0]
-            self.create_text(1,y,anchor="nw", font=self.font,text = linenum, fill = "#003200")
+            self.create_text(1,y,anchor="nw", font=self.font,text = linenum, fill = "#600061")
             i = self.textwidget.index("%s+1line" % i)
 
 
@@ -253,22 +256,23 @@ class App(tk.Tk):
         super().__init__(master)  # again init using parent method
         #self.pack(expand=True,fill=tk.BOTH)
         self.initUI()
+        self.configure(bg = "#000000")
         self.style=ttk.Style()
         self.style.theme_use("clam")
 
     def initUI(self):
-        frame1 = tk.Frame(self)
+        frame1 = tk.Frame(self, bg="#000000")
         frame1.pack(fill=ctk.BOTH, expand=True)
         
         # textpad 
-        self.rightPanel = RightPanel(frame1, bg="#331e36", fg='white', font=font.Font(family='monospace', size=14), padx=5, pady=0)
+        self.rightPanel = RightPanel(frame1, bg="#0e003f", fg='#FFFFFF', font=font.Font(family='monospace', size=14), padx=5, pady=0)
         self.textline = TextLineNumbers(frame1, width=30)
         self.textline.attach(self.rightPanel.textPad)
         self.textline.pack(side='left', fill='y', before=self.rightPanel.textPad)
         self.leftPanel = LeftPanel(master=frame1,right_panel=self.rightPanel)
         self.leftPanel.pack(side='left', fill='y', before=self.textline)
-        self.terminal = Terminal(frame1,height=10,background='black',foreground='white',font=font.Font(family='monospace', size=14),padx=5,
-                                  pady=0,insertbackground='white',selectbackground='white',highlightthickness=0)
+        self.terminal = Terminal(frame1,height=10,background='#000000',foreground='#00FF00',font=font.Font(family='monospace', size=14),padx=5,
+                                  pady=0,insertbackground='#FFFFFF',selectbackground='#FFFFFF',highlightthickness=0)
         self.terminal.shell = True
         self.terminal.pack(side=tk.BOTTOM, expand=True,fill=tk.BOTH,before=self.rightPanel.textPad)
         
@@ -280,7 +284,7 @@ class App(tk.Tk):
 
     def on_change(self, event):
         self.textline.redraw()
-        self.rightPanel.textPad
+        self.rightPanel.textPad.highlightall(len(self.rightPanel.textPad.get('1.0', 'end-1c').splitlines()), self)
 
 if __name__ == '__main__':
     app = App()
