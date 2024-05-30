@@ -42,11 +42,11 @@ class LeftPanel(tk.Frame):
     def __init__(self, master=None, right_panel=None):
         super().__init__(master)
         self.right_panel = right_panel
-        self.selected_dir = self.right_panel.selected_dir
+        
         self.initUI(master)
 
     def initUI(self, master):
-        self.file_path = tk.StringVar(master, self.right_panel.selected_dir)
+        self.file_path = tk.StringVar(master, self.right_panel.selected_dir.get())
         self.selected_dir = os.path.dirname(self.file_path.get())
         self.breadcrumb = tk.StringVar(value="File")  # Initialize Breadcrumb
         self.breadcrumb_label = ctk.CTkLabel(
@@ -119,7 +119,6 @@ class RightPanel(tk.Frame):
         file_path = filedialog.asksaveasfilename(
             defaultextension=".txt",
             filetypes=(('Текстовые документы (*.txt)', '*.txt'), ('Все файлы', '*.*')))
-
         if file_path:
             with open(file_path, 'w', encoding='utf-8') as file:
                 file.write(self.textPad.get('1.0', 'end'))
@@ -132,7 +131,7 @@ class RightPanel(tk.Frame):
             self.selected_file = file_path
             self.textPad.delete('1.0', 'end')
             self.textPad.insert('1.0', open(file_path, encoding='utf-8').read())
-            self.selected_dir = os.path.dirname(file_path)
+            self.selected_dir.set(os.path.dirname(file_path))
 
     def update_text_from_file(self):
         if self.selected_file:
