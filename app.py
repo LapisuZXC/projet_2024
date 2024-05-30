@@ -10,19 +10,16 @@ from pygments.token import Keyword, Name, Comment, String, Error, \
 from pygments.formatter import Formatter
 from pygments import highlight
 from pygments.lexers import PythonLexer
-import os
 
   
 
 class UpperPanel(tk.Frame):
-    
 
     def __init__(self,master=None,right_panel=None,*args,**kwargs):
         super().__init__(master)
         self.right_panel = right_panel
         self.initUI(master,*args,**kwargs)
-        
-    
+
     def initUI(self, master, *args, **kwargs):
         self.frame = tk.Frame(master, height=25)
         self.save_b = ctk.CTkButton(self.frame,fg_color="gray",corner_radius=0,width=55,text="save",command=lambda : self.right_panel.saveFile())
@@ -33,7 +30,6 @@ class UpperPanel(tk.Frame):
         self.open_b.pack(side=tk.LEFT,expand=False, fill=tk.BOTH)
         self.save_b.pack(side=tk.LEFT,expand=False, fill=tk.BOTH)
         self.frame.pack(expand=False, fill=ctk.BOTH, anchor='n', side=tk.TOP)
-        
 
     def attach(self, text_widget):
         self.textwidget = text_widget
@@ -98,12 +94,9 @@ class RightPanel(tk.Frame):
         self.textPad.pack(side=tk.BOTTOM,expand=True,fill=tk.BOTH)    
         self.tools = UpperPanel(master,self,*args,**kwargs)             # Тут кнопочки всякие
         self.tools.attach(master)#?
-        
-        
-        
+
     def newFile(self):
         self.textPad.delete('1.0', 'end')
-
 
     def saveFile(self):
         file_path = filedialog.asksaveasfilename(filetypes=(('Текстовые документы (*.txt)', '*.txt'), ('Все файлы', '*.*')))
@@ -122,16 +115,12 @@ class RightPanel(tk.Frame):
             
 
 class TextLineNumbers(ctk.CTkCanvas):
-    
-
-
     def __init__(self,*args,**kwargs):
         ctk.CTkCanvas.__init__(self,*args,**kwargs)  # init using parent class initialisation
         self.textwidget = None
         self.fontSize = 12
         self.configFont()
         self.text_color = "black"
-
 
     def configFont(self): # dont know if needed tbh
         system = platform.system().lower()
@@ -140,10 +129,8 @@ class TextLineNumbers(ctk.CTkCanvas):
         elif system == "linux":
             self.font = font.Font(family='monospace',size = self.fontSize)
 
-
     def attach(self, text_widget):
         self.textwidget = text_widget
-
 
     def redraw(self,*args):
         self.delete('all')
@@ -159,7 +146,6 @@ class TextLineNumbers(ctk.CTkCanvas):
 
 
 class TextPad(tk.Text):
-    
 
     def __init__(self, *args, **kwargs):
         tk.Text.__init__(self, *args, **kwargs)
@@ -193,38 +179,74 @@ class TextPad(tk.Text):
         # basically there is custom tkinted event <<Change>> created
         
         self.fontSize = 20
-        
-        
+        self.bind('<KeyRelease>', self.highlight, add='+')
 
-# TODO associate a function with text directly from the application
-class CustomFormatter(Formatter):
-    def __init__(self, **options):
-        super(CustomFormatter, self).__init__(**options)
-        self.styles = {
-            Keyword: '\033[94m',  # Blue
-            Operator: '\033[91m',  # Red
-            Operator.Word: '\033[93m',  # Yellow
-            Number.Integer: '\033[91m',  # Red
-            Number.Float: '\033[91m',  # Red
-            String.Doc: '\033[92m',  # Green
-            String.Double: '\033[92m',  # Green (multiline comments)
-            Name: '\033[93m',  # Yellow
-            Name.Builtin: '\033[95m',  # Purple
-            Name.Function.Magic: '\033[95m',  # Purple ex. __init__
-            Comment.Single: '\033[92m',  # Green
-            Punctuation: '\033[93m',  # Yellow
-        }
+    def highlight(self, event=None, lineNumber=None):
+        index = self.index(tk.INSERT).split(".")
+        line_no = int(index[0])
+        if lineNumber is None:
+            line_text = self.get("%d.%d" % (line_no, 0), "%d.end" % (line_no))
+            self.mark_set("range_start", str(line_no) + '.0')
 
-    def format(self, tokensource, outfile):
-        for ttype, value in tokensource:
-            color = self.styles.get(ttype, '\033[0m')  # Default text without color
-            outfile.write(f"{color}{value}\033[0m")  # Reset to default after each token
+        elif lineNumber is not None:
+            line_text = self.get("%d.%d" % (lineNumber, 0), "%d.end" % (lineNumber))
+            self.mark_set("range_start", str(lineNumber) + '.0')
 
+        for token, content in lex(line_text, PythonLexer()):
+            self.tag_configure("Token.Name", foreground="#FFFFFF")
+            self.tag_configure("Token.Text", foreground="#FFFFFF")
 
-''' format function test 
-code = 'for u in range(10): print("Hello world!") \n#text \nprint(20.2) \nx=5 \n\'\'\'I love \ncoding\'\'\''
-formatted_code = highlight(code, PythonLexer(), CustomFormatter())
-print(formatted_code)'''
+            self.tag_configure("Token.Keyword", foreground="#CC7A00")
+            self.tag_configure("Token.Keyword.Constant", foreground="#CC7A00")
+            self.tag_configure("Token.Keyword.Declaration", foreground="#CC7A00")
+            self.tag_configure("Token.Keyword.Namespace", foreground="#CC7A00")
+            self.tag_configure("Token.Keyword.Pseudo", foreground="#CC7A00")
+            self.tag_configure("Token.Keyword.Reserved", foreground="#CC7A00")
+            self.tag_configure("Token.Keyword.Type", foreground="#CC7A00")
+
+            self.tag_configure("Token.Punctuation", foreground="#2d991d")
+
+            self.tag_configure("Token.Name.Class", foreground="#ddd313")
+            self.tag_configure("Token.Name.Exception", foreground="#ddd313")
+            self.tag_configure("Token.Name.Function", foreground="#298fb5")
+            self.tag_configure("Token.Name.Function.Magic", foreground="#298fb5")
+            self.tag_configure("Token.Name.Decorator", foreground="#298fb5")
+
+            self.tag_configure("Token.Name.Builtin", foreground="#CC7A00")
+            self.tag_configure("Token.Name.Builtin.Pseudo", foreground="#CC7A00")
+
+            self.tag_configure("Token.Operator.Word", foreground="#CC7A00")
+            self.tag_configure("Token.Operator", foreground="#FF0000")
+
+            self.tag_configure("Token.Comment", foreground="#767d87")
+            self.tag_configure("Token.Comment.Single", foreground="#767d87")
+            self.tag_configure("Token.Comment.Double", foreground="#767d87")
+
+            self.tag_configure("Token.Literal.Number.Integer", foreground="#88daea")
+            self.tag_configure("Token.Literal.Number.Float", foreground="#88daea")
+            #
+            self.tag_configure("Token.Literal.String.Single", foreground="#35c666")
+            self.tag_configure("Token.Literal.String.Double", foreground="#35c666")
+
+            self.mark_set("range_end", "range_start + %dc" % len(content))
+            self.tag_add(str(token), "range_start", "range_end")
+            self.mark_set("range_start", "range_end")
+
+    def highlightall(self, linesInFile, overlord, event=None):
+        '''
+            highlight whole document (when loading a file) ... this can taking a few seconds
+            if the file is big ..... no better solution found
+        '''
+
+        code = self.get("1.0", "end-1c")
+        i = 1
+        for line in code.splitlines():
+            self.index("%d.0" % i)
+            self.highlight(lineNumber=i)
+            percent = i / linesInFile * 100
+            percent = round(percent, 2)
+            overlord.title('Loading ... ' + str(percent) + ' %')
+            i += 1
 
 
 class App(tk.Tk):
@@ -235,7 +257,6 @@ class App(tk.Tk):
         self.initUI()
         self.style=ttk.Style()
         self.style.theme_use("clam")
-        
 
     def initUI(self):
         frame1 = tk.Frame(self)
