@@ -111,7 +111,7 @@ class RightPanel(tk.Frame):
 
     def on_selected_file_change(self, *args):
         if self.selected_file:
-            self.selected_dir = os.path.dirname(self.selected_file)
+            self.selected_dir.set(os.path.dirname(self.selected_file))
 
     def newFile(self):
         self.textPad.delete('1.0', 'end')
