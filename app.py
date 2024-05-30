@@ -72,7 +72,6 @@ class LeftPanel(tk.Frame):
 
         self.file_list.bind("<<ListboxSelect>>", self.on_file_select)
 
-
     def update_file_list(self, file_path):
         bufer = file_path.get()
         print(bufer)
@@ -140,8 +139,6 @@ class RightPanel(tk.Frame):
             with open(self.selected_file, 'r', encoding='utf-8') as file:
                 self.textPad.delete('1.0', tk.END)  # Очищаем текстовое поле
                 self.textPad.insert(tk.END, file.read())
-
-
 
 
 class TextLineNumbers(ctk.CTkCanvas):
@@ -297,8 +294,8 @@ class App(tk.Tk):
         self.textline.pack(side='left', fill='y', before=self.rightPanel.textPad)
         self.leftPanel = LeftPanel(master=frame1, right_panel=self.rightPanel)
         self.leftPanel.pack(side='left', fill='y', before=self.textline)
-        self.terminal = Terminal(frame1,height=10,background='#000000',foreground='#00FF00',font=font.Font(family='monospace', size=14),padx=5,
-                                  pady=0,insertbackground='#FFFFFF',selectbackground='#FFFFFF',highlightthickness=0)
+        self.terminal = Terminal(frame1, height=10,background='#000000',foreground='#00FF00', font=font.Font(family='monospace', size=14), padx=5,
+                                  pady=0, insertbackground='#FFFFFF', selectbackground='#FFFFFF', highlightthickness=0)
         self.terminal.shell = True
         self.terminal.pack(side=tk.BOTTOM, expand=True, fill=tk.BOTH, before=self.rightPanel.textPad)
 
