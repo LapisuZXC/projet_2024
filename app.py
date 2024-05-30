@@ -6,9 +6,6 @@ from tkterminal import Terminal
 import keyword
 import platform
 import os
-from pygments.token import Keyword, Name, Comment, String, Error, \
-    Number, Operator, Generic, Whitespace, Punctuation, Other, Literal, Text
-from pygments.formatter import Formatter
 from pygments import highlight, lex
 from pygments.lexers import PythonLexer
 
@@ -76,12 +73,10 @@ class LeftPanel(tk.Frame):
 
     def update_file_list(self, file_path: tk.StringVar):
         bufer = file_path.get()
-        print(bufer)
         if bufer != '':
             self.file_list.delete(0, tk.END)
             for i in os.listdir(bufer):
                 self.file_list.insert(tk.END, i)
-            print('zhopa')
 
     def on_file_select(self, event):
         selection = self.file_list.curselection()
@@ -171,7 +166,7 @@ class TextLineNumbers(ctk.CTkCanvas):
                 break
             y = dline[1]
             linenum = str(i).split(".")[0]
-            self.create_text(1,y,anchor="nw", font=self.font,text = linenum, fill = "#600061")
+            self.create_text(1, y, anchor="nw", font=self.font, text=linenum, fill="#600061")
             i = self.textwidget.index("%s+1line" % i)
 
 
@@ -297,7 +292,7 @@ class App(tk.Tk):
         self.textline.pack(side='left', fill='y', before=self.rightPanel.textPad)
         self.leftPanel = LeftPanel(master=frame1, right_panel=self.rightPanel)
         self.leftPanel.pack(side='left', fill='y', before=self.textline)
-        self.terminal = Terminal(frame1, height=10,background='#000000',foreground='#00FF00', font=font.Font(family='monospace', size=14), padx=5,
+        self.terminal = Terminal(frame1, height=10, background='#000000', foreground='#00FF00', font=font.Font(family='monospace', size=14), padx=5,
                                   pady=0, insertbackground='#FFFFFF', selectbackground='#FFFFFF', highlightthickness=0)
         self.terminal.shell = True
         self.terminal.pack(side=tk.BOTTOM, expand=True, fill=tk.BOTH, before=self.rightPanel.textPad)
